@@ -1,16 +1,15 @@
-from findiff import FinDiff
 import matplotlib.pyplot as plt
-from funciones import RK4
+from funciones import RK4, balance
 import numpy as np
 from scipy.integrate import odeint
 
 
-def VdP(uv, t, alpha):
+def VdP(t, uv, alpha):
     u, v = uv
     vdot = -alpha * (u**2 - 1) * v - u
     udot = v
 
-    return udot, vdot
+    return np.array([udot, vdot])
 
 
 def Energy(uv, params):
@@ -27,48 +26,12 @@ def dEdt(uv, alpha):
     return dE
 
 
-def balance(Energy, dEdt, uv, dt, params):
-    """
-    Esta función recibe u (x), v (dx/dt), parametros extra y
-    las funciones de la energía y su derivada. Devuelve un vector
-    de balance que tiene la diferencia de la energía del sistema
-    en cada tiempo con respecto al valor teórico normalizado por
-    el valor inicial de la energía.
-    """
-    d_dt = FinDiff(0, dt, acc=6)
-    E = Energy(uv, params)
-    dE = d_dt(E)
-    dEt = dEdt(uv, params)
-    return dt * (dE - dEt) / np.min(E)
-
-
-def RK4(f, t0, u0, v0, alpha, h, pasos):
-    # inicial
-    u = u0
-    v = v0
-    t = t0
-    U, V = [u], [v]
-
-    for i in range(pasos):
-        k1 = f([u, v], t, alpha)
-        k2 = f([u + h / 2 * k1[0], v + h / 2 * k1[1]], t + h / 2, alpha)
-        k3 = f([u + h / 2 * k2[0], v + h / 2 * k2[1]], t + h / 2, alpha)
-        k4 = f([u + h * k3[0], v + h * k3[1]], t + h, alpha)
-        t = t + h
-        u = u + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0])
-        v = v + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])
-        U.append(u)
-        V.append(v)
-
-    return (np.array(U), np.array(V))
-
-
 h = 0.01
 tf = 10
 pasos = int(tf / h)
 t = np.linspace(0, tf, pasos + 1)
-u0 = 1
-v0 = 10
+CI = np.array([1, 10])  # cond ini [u0, v0]
+alpha = 0.5
 
 """
 e) Utilice la herramienta odeint de scipy para integrar 
@@ -76,9 +39,10 @@ tanto en las condiciones del punto c. Analice la elección de intervalos tempora
 """
 
 for alpha in [0.5, 1.5, 3]:
-    u, v = RK4(VdP, 0, u0, v0, alpha, h, pasos)
+    uv = RK4(VdP, 0, CI, alpha, h, pasos)
+    u, v = uv[:, 0], uv[:, 1]
     bal = balance(Energy, dEdt, [u, v], h, alpha)
-    sol = odeint(VdP, [u0, v0], t, args=(alpha,))
+    sol = odeint(VdP, CI, t, args=(alpha,), tfirst=True)  # va primero t y después uv
     if max(bal) < 10 - 3:
         plt.figure()
         plt.grid()

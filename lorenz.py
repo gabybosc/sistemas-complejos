@@ -37,10 +37,12 @@ def lorenz(t, r, params):
     ydot = rho * x - y - x * z
     zdot = x * y - beta * z
 
-    return [xdot, ydot, zdot]
+    return np.array([xdot, ydot, zdot])
 
 
 def correr(f, r0, params):
+    """Resuelve la ode usando scipy, devuelve un array"""
+
     solver = ode(f).set_integrator("dopri5")
     solver.set_initial_value(r0, t=0.0).set_f_params(params)
 
@@ -66,10 +68,10 @@ sigmarhobeta = (10, 25, 8 / 3)
 b) Integrando como en c y usando rho=30 compare la evolución temporal de y
 para las condiciones iniciales (x0,y0,z0)=(0,0.5,0.5) y (x′0,y′0,z′0)=(0,0.5,0.50001). ¿Qué observa?
 """
-solver = ode(lorenz).set_integrator("dopri5")
 r0 = [0, 0.5, 0.5]
 r0_2 = [0, 0.5, 0.50001]
 sigmarhobeta = (10, 30, 8 / 3)
+
 # evo = correr(lorenz, r0, sigmarhobeta)
 # evo2 = correr(lorenz, r0_2, sigmarhobeta)
 
@@ -93,34 +95,9 @@ Grafique la diferencia absoluta entre las dos soluciones en función del tiempo.
 h = 0.005
 pasos = int(50 / h)
 
+sol_ode = correr(lorenz, r0, sigmarhobeta)
+sol = RK4(lorenz, 0, r0, sigmarhobeta, h, pasos)
 
-def RK4_lorenz(f, t0, r0, params, h, pasos):
-    # inicial
-    x, y, z = r0
-    t = t0
-    X, Y, Z = [x], [y], [z]
-
-    for i in range(pasos):
-        k1 = f(t, [x, y, z], params)
-        k2 = f(
-            t + h / 2, [x + h / 2 * k1[0], y + h / 2 * k1[1], z + h / 2 * k1[2]], params
-        )
-        k3 = f(
-            t + h / 2, [x + h / 2 * k2[0], y + h / 2 * k2[1], z + h / 2 * k2[2]], params
-        )
-        k4 = f(t + h, [x + h * k3[0], y + h * k3[1], z + h * k3[2]], params)
-        t = t + h
-        x = x + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0])
-        y = y + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])
-        z = z + h / 6 * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])
-        X.append(x)
-        Y.append(y)
-        Z.append(z)
-
-    return (np.array(X), np.array(Y), np.array(Z))
-
-
-sol = RK4_lorenz(lorenz, 0, r0, sigmarhobeta, h, pasos)
-
-plt.plot(sol[0], sol[1])
+plt.plot(sol[:, 0], sol[:, 1])
+plt.plot(sol_ode[:, 0], sol_ode[:, 1])
 plt.show()

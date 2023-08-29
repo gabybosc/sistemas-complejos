@@ -1,8 +1,7 @@
-from findiff import FinDiff
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
-from funciones import RK4
+from funciones import RK4, balance
 
 
 """
@@ -11,12 +10,12 @@ Use la conservación de la energía para elegir un paso temporal tal que esta se
 """
 
 
-def duffing(uv, t, params):
+def duffing(t, uv, params):
     u, v = uv
     omega, gamma, delta, beta, alpha = params
     udot = v
     vdot = gamma * np.cos(omega * t) - delta * v - beta * u - alpha * u**3
-    return (udot, vdot)
+    return np.array([udot, vdot])
 
 
 def Energy_duffing(uv, params):
@@ -35,29 +34,15 @@ def dEdt_duffing(uv, params):
     return dE
 
 
-def balance_duffing(Energy, dEdt, uv, dt, params):
-    """
-    Esta función recibe u (x), v (dx/dt), parametros extra y
-    las funciones de la energía y su derivada. Devuelve un vector
-    de balance que tiene la diferencia de la energía del sistema
-    en cada tiempo con respecto al valor teórico normalizado por
-    el valor inicial de la energía.
-    """
-    d_dt = FinDiff(0, dt, acc=6)
-    E = Energy(uv, params)
-    dE = d_dt(E)
-    dEt = dEdt(uv, params)
-    return dt * (dE - dEt) / np.min(E)
-
-
 h = 0.01
 pasos = int(20 / h)
 t = np.linspace(0, 20, pasos + 1)
 u0 = [1, 1]  # agregar un loop en CIs
 params = [1, 0.3, 0.22, -1, 1]  # omega, gamma, delta, beta, alpha
 
-u, v = RK4(duffing, 0, u0, params, h, pasos)
-bal = balance_duffing(Energy_duffing, dEdt_duffing, [u, v], h, params)
+uv = RK4(duffing, 0, u0, params, h, pasos)
+u, v = uv[:, 0], uv[:, 1]
+bal = balance(Energy_duffing, dEdt_duffing, [u, v], h, params)
 if max(bal) < 10e-3:
     plt.figure()
     plt.grid()
