@@ -64,10 +64,11 @@ def RK4(f, t0, u0, v0, alpha, h, pasos):
 
 
 h = 0.01
-pasos = int(5 / h)
-t = np.linspace(0, 5, pasos + 1)
+tf = 10
+pasos = int(tf / h)
+t = np.linspace(0, tf, pasos + 1)
 u0 = 1
-v0 = 1
+v0 = 10
 
 """
 e) Utilice la herramienta odeint de scipy para integrar 
