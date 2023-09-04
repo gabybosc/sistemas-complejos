@@ -117,7 +117,7 @@ que le di para entrenar, pero después no.
 # plt.show()
 
 """
-Ahora, vamos a probar entrenando de nuevo a la red, pero esta vez como pinn
+Ahora, vamos a probar entrenando de nuevo a la reds, pero esta vez como pinn
 """
 t_data = torch.linspace(0, 0.5, 20).view(-1, 1)  # Tiempos de los datos
 y_data = oscilador(t_data, delta, w0).view(-1, 1)  # Valores de los datos 'medidos'
@@ -127,6 +127,8 @@ t_physics = torch.linspace(0, 1, 20).view(-1, 1).requires_grad_(True)
 iterations = 15000
 l = 1e-4  # Lambda
 pinn = MLP([1, 32, 32, 32, 1])
+optimizer = torch.optim.Adam(pinn.parameters(), lr=1e-4)  # usamos este optimizador
+
 for epoch in range(iterations):
     optimizer.zero_grad()  # vuelvo a borrar el optimizer
     yh = pinn(t_data)  # yh es la pinn en t_data (t en que entreno, hasta 0.5)
