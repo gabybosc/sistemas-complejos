@@ -1,5 +1,6 @@
 import numpy as np
 from findiff import FinDiff
+from scipy.integrate import ode
 
 
 def RK4(f, t0, r0, params, h, pasos):
@@ -33,3 +34,31 @@ def balance(Energy, dEdt, uv, dt, params):
     dE = d_dt(E)
     dEt = dEdt(uv, params)
     return dt * (dE - dEt) / np.min(E)
+
+
+def lorenz(t, r, params):
+    x, y, z = r
+    sigma, rho, beta = params
+    xdot = sigma * (y - x)
+    ydot = rho * x - y - x * z
+    zdot = x * y - beta * z
+
+    return np.array([xdot, ydot, zdot])
+
+
+def correr(f, r0, tf, dt, params):
+    """Resuelve la ode usando scipy, devuelve un array"""
+
+    solver = ode(f).set_integrator("dopri5")
+    solver.set_initial_value(r0, t=0.0).set_f_params(params)
+
+    i = 0
+    evolution = []
+    time = []
+    while solver.successful() and solver.t < tf:
+        i += 1
+        solver.integrate(solver.t + dt)
+        evolution.append(solver.y)
+        time.append(solver.t + dt)
+
+    return np.array(time), np.array(evolution)

@@ -66,10 +66,10 @@ Vamos a tomar 20 datos equiespaciados entre t=0 y t=0.5
 """
 delta = 2
 w0 = 18
-t_data = torch.linspace(0, 0.5, 20).view(-1, 1)  # Tiempos de los datos
-y_data = oscilador(t_data, delta, w0).view(-1, 1)  # Valores de los datos 'medidos'
-mlp = MLP([1, 32, 32, 32, 1])  # la red feedforward
-optimizer = torch.optim.Adam(mlp.parameters(), lr=1e-4)  # usamos este optimizador
+# t_data = torch.linspace(0, 0.5, 20).view(-1, 1)  # Tiempos de los datos
+# y_data = oscilador(t_data, delta, w0).view(-1, 1)  # Valores de los datos 'medidos'
+# mlp = MLP([1, 32, 32, 32, 1])  # la red feedforward
+# optimizer = torch.optim.Adam(mlp.parameters(), lr=1e-4)  # usamos este optimizador
 
 """
 En la siguiente celda se encuentra el loop de entrenamiento. 
@@ -152,16 +152,16 @@ for epoch in range(iterations):
 print(epoch, loss1, loss2, "Traning Loss:", loss.data)
 
 
-t0 = 0  # Tiempo inicial
-tf = 1  # Tiempo final
-N = 1000  # Numero de puntos
-test_time = torch.linspace(t0, tf, N).view(-1, 1)
-y_test = oscilador(test_time, delta, w0).view(-1, 1)  # Esta es la solución teórica
-yhp = pinn(test_time)  # Evaluación de la red
+# t0 = 0  # Tiempo inicial
+# tf = 1  # Tiempo final
+# N = 1000  # Numero de puntos
+# test_time = torch.linspace(t0, tf, N).view(-1, 1)
+# y_test = oscilador(test_time, delta, w0).view(-1, 1)  # Esta es la solución teórica
+# yhp = pinn(test_time)  # Evaluación de la red
 
-plt.plot(test_time.detach().numpy(), y_test, label="teórica")
-plt.plot(test_time.detach().numpy(), yhp.detach().numpy(), label="red")
-plt.xlabel("t")
-plt.ylabel("x")
-plt.legend()
-plt.show()
+# plt.plot(test_time.detach().numpy(), y_test, label="teórica")
+# plt.plot(test_time.detach().numpy(), yhp.detach().numpy(), label="red")
+# plt.xlabel("t")
+# plt.ylabel("x")
+# plt.legend()
+# plt.show()

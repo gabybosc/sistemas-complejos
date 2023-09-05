@@ -1,0 +1,97 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+from torch.autograd import Variable
+from funciones import lorenz, correr
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
+class MLP(torch.nn.Module):
+    def __init__(self, sizes):
+        super().__init__()
+        self.layers = torch.nn.ModuleList()
+        for i in range(len(sizes) - 1):
+            self.layers.append(torch.nn.Linear(sizes[i], sizes[i + 1]))
+
+    def forward(self, x):
+        h = x
+        for hidden in self.layers[:-1]:
+            h = torch.sin(hidden(h))
+        output = self.layers[-1]
+        y = output(h)
+        return y
+
+
+r0 = [-5.9, -6.7, 20]
+sigma = 10
+rho = 25
+beta = 8 / 3
+tf = 25
+h = 1e-2
+t, evo = correr(lorenz, r0, tf, h, (sigma, rho, beta))
+
+"""
+Defina los puntos que serán los datos "medidos" de nuestro problema.
+Vamos a tomar 20 datos equiespaciados entre t=0 y t=0.5
+# """
+t_data = torch.linspace(0, 25, 2500).view(-1, 1)  # Tiempos de los datos
+t_physics = torch.linspace(0, 50, 5000).view(-1, 1).requires_grad_(True)
+iterations = 60000
+y_data = torch.tensor(
+    np.transpose([evo[:, 0], evo[:, 1], evo[:, 2]])
+)  # Valores de los datos 'medidos'
+pinn = MLP([1, 128, 128, 128, 128, 128, 128, 128, 128, 3])  # la red feedforward
+optimizer = torch.optim.Adam(pinn.parameters(), lr=1e-4)  # usamos este optimizador
+l = 1e-5  # Lambda
+
+
+"""
+u = yhp[:,0]
+v = yhp[:,1]
+w = yhp[:,2]
+dx  = torch.autograd.grad(yhp, t_physics, torch.ones_like(yhp), create_graph=True)[0]
+physics = dx - sigma*(v-u) - rho*u + v + u*w - u*v - beta*w  # Residual de la ecuación diferencial
+loss2 = l*torch.mean(physics**2)
+
+"""
+
+for epoch in range(iterations):
+    optimizer.zero_grad()  # vuelvo a borrar el optimizer
+    yh = pinn(t_data.to(torch.float32))  # yh es la pinn en t_data
+    loss1 = torch.mean((yh - y_data) ** 2)
+    yhp = pinn(t_physics)  # yhp es la pinn en t_phyiscs
+    # Computo de derivada
+    u = yhp[:, 0]
+    v = yhp[:, 1]
+    w = yhp[:, 2]
+
+    dx = torch.autograd.grad(yhp, t_physics, torch.ones_like(yhp), create_graph=True)[0]
+    physics = (
+        dx - sigma * (v - u) - rho * u + v + u * w - u * v - beta * w
+    )  # Residual de la ecuación diferencial
+    # Calculo el error cuadrático medio para la física
+    loss2 = l * torch.mean(physics**2)
+
+    loss = loss1 + loss2  # Se suma el error de la física con el de los datos
+    loss.backward()
+    optimizer.step()
+
+# print(epoch, loss1, loss2, "Traning Loss:", loss.data)
+
+
+t0 = 0  # Tiempo inicial
+tf = 50  # Tiempo final
+N = int(tf / h)  # Numero de puntos
+test_time = torch.linspace(t0, tf, N).view(-1, 1)
+t2, y_test = correr(lorenz, r0, tf, h, (sigma, rho, beta))
+yhp = pinn(test_time)  # Evaluación de la red
+
+plt.plot(y_test[:, 0], y_test[:, 1], label="teórica")
+plt.plot(yhp[:, 0].detach().numpy(), yhp[:, 1].detach().numpy(), label="red")
+
+plt.plot(y_test[:-1, 0], yhp[:, 0].detach().numpy())
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.show()

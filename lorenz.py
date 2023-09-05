@@ -1,34 +1,6 @@
-from scipy.integrate import ode
 import matplotlib.pyplot as plt
 import numpy as np
-from funciones import RK4
-
-
-def lorenz(t, r, params):
-    x, y, z = r
-    sigma, rho, beta = params
-    xdot = sigma * (y - x)
-    ydot = rho * x - y - x * z
-    zdot = x * y - beta * z
-
-    return np.array([xdot, ydot, zdot])
-
-
-def correr(f, r0, tf, dt, params):
-    """Resuelve la ode usando scipy, devuelve un array"""
-
-    solver = ode(f).set_integrator("dopri5")
-    solver.set_initial_value(r0, t=0.0).set_f_params(params)
-
-    i = 0
-    evolution = []
-    while solver.successful() and solver.t < tf:
-        i += 1
-        solver.integrate(solver.t + dt)
-        evolution.append(solver.y)
-
-    return np.array(evolution)
-
+from funciones import RK4, correr, lorenz
 
 r0 = [0, 0.5, 0.5]
 sigmarhobeta = (10, 25, 8 / 3)
