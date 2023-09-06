@@ -28,7 +28,7 @@ sigma = 10
 rho = 25
 beta = 8 / 3
 tf = 25
-h = 1e-3
+h = 1e-2
 t, evo = correr(lorenz, r0, tf, h, (sigma, rho, beta))
 
 # plt.figure(1)
@@ -48,14 +48,14 @@ y_data    = torch.tensor(np.transpose([v[:,0],v[:,1],v[:,2]]))
 t_physics = torch.linspace(0,tf,N).view(-1,1).requires_grad_(True)
 """
 # t_data = torch.linspace(0, 25, 25000).view(-1, 1)  # Tiempos de los datos
-t_data = torch.from_numpy(t).view(-1, 1)  # Tiempos de los datos
-t_physics = torch.linspace(0, 50, 50000).view(-1, 1).requires_grad_(True)
-y_data = torch.tensor(np.transpose([evo[:, 0], evo[:, 1], evo[:, 2]]))
+t_data = torch.from_numpy(t[::10]).view(-1, 1)  # Tiempos de los datos
+t_physics = torch.linspace(0, 50, 5000).view(-1, 1).requires_grad_(True)
+y_data = torch.tensor(np.transpose([evo[::10, 0], evo[::10, 1], evo[::10, 2]]))
 
 pinn = MLP([1] + [128] * 4 + [3])  # la red feedforward
 optimizer = torch.optim.Adam(pinn.parameters(), lr=1e-4)  # usamos este optimizador
 l = 1e-5  # Lambda
-iterations = 15000
+iterations = 20000
 
 
 """
