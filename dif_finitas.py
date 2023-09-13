@@ -56,10 +56,14 @@ x = np.linspace(0, 2 * np.pi, nx, endpoint=False)  # Coordenada espacial en [0,2
 t = np.arange(nt) * dt
 
 u = np.zeros([nx, nt])
-u[:, 0] = np.sin(x)  # alguna condicion inicial
+# u[:, 0] = np.sin(3 * x)  # alguna condicion inicial
+u[:, 0] = np.sin(3 * x) ** 2 + np.cos(2 * x)  # alguna condicion inicial
+# func escalón
+# u[:250, 0] = 0
+# u[250:, 0] = 1e-3
 
 U = solver_burgers(u, nu, dx, dt)
 
-for t in range(100, 105):
+for t in range(100):
     plt.plot(x[:450], U[:450, t])
 plt.show()
