@@ -5,19 +5,16 @@ import matplotlib.pyplot as plt
 # Defino mis puntos en el espacio real y los modos para el espacio de Fourier
 
 dt = 1e-3
-step = 100
+step = 10000
 N = 512
-nu = 0
+nu = 1e-2
 
 x = np.linspace(0, 2 * np.pi, N, endpoint=False)  # Coordenada espacial en [0,2*pi)
 t = np.arange(step) * dt  # Tiempo
 
 k = np.arange(0, N / 2 + 1)  # Números de onda ordenados como en la FFT
 
-u = x * (x - 2 * np.pi)
-utilde = np.fft.rfft(u)
-params = [nu, N]
-h = dt
+u = np.sin(x)  # condición inicial
 
 
 def rip(t, u, params):
@@ -73,6 +70,8 @@ for i in np.arange(step - 1):  # Evolución temporal
     sol[:, i + 1] = evol(rip, sol[:, i], k, [nu, N], dt)
 
 
-for i in [0, 99]:
-    plt.plot(x, sol[:, i])
+for i in [0, 1900, 3900, 5900, 7900, 9900]:
+    plt.plot(x, sol[:, i], label=f"iteración {i}")
+plt.legend()
+plt.title("Formación del choque")
 plt.show()
