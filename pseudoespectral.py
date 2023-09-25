@@ -24,7 +24,7 @@ def rip(t, u, params):
 
 
 def RK2(f, t0, r0, params, h):
-    """RK de orden 4"""
+    """RK de orden 2"""
     # inicial
     t = t0
     r = r0
