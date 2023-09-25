@@ -5,16 +5,20 @@ import matplotlib.pyplot as plt
 # Defino mis puntos en el espacio real y los modos para el espacio de Fourier
 
 dt = 1e-3
-step = 10000
+step = 100
 N = 512
-nu = 1e-2
+nu = 1  # e-2
 
 x = np.linspace(0, 2 * np.pi, N, endpoint=False)  # Coordenada espacial en [0,2*pi)
 t = np.arange(step) * dt  # Tiempo
 
 k = np.arange(0, N / 2 + 1)  # Números de onda ordenados como en la FFT
 
-u = np.sin(x)  # condición inicial
+# u = x * (x - 2 * np.pi)
+u = np.sin(x)
+utilde = np.fft.rfft(u)
+params = [nu, N]
+h = dt
 
 
 def rip(t, u, params):
