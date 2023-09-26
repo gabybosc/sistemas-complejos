@@ -47,32 +47,26 @@ t_data    = t_data.to(torch.float32)
 y_data    = torch.tensor(np.transpose([v[:,0],v[:,1],v[:,2]]))
 t_physics = torch.linspace(0,tf,N).view(-1,1).requires_grad_(True)
 """
-# t_data = torch.linspace(0, 25, 25000).view(-1, 1)  # Tiempos de los datos
-t_data = torch.from_numpy(t).view(-1, 1)  # Tiempos de los datos
-t_physics = torch.linspace(0, 50, 50000).view(-1, 1).requires_grad_(True)
-y_data = torch.tensor(np.transpose([evo[:, 0], evo[:, 1], evo[:, 2]]))
 
-pinn = MLP([1] + [128] * 8 + [3])  # la red feedforward
+t_data = torch.load("t_data.pt")
+t_physics = torch.load("t_physics.pt")
+y_data = torch.load("y_data.pt")
+yhp = torch.load("yhp.pt")
+yh = torch.load("yh.pt")
+
+
+# pinn = MLP([1] + [128] * 4 + [3])  # la red feedforward
+pinn = torch.load("pinn.pt")
 optimizer = torch.optim.Adam(pinn.parameters(), lr=1e-4)  # usamos este optimizador
-l = 1e-6  # Lambda
+l = 1e-5  # Lambda
 iterations = 20000
 
 
-"""
-u = yhp[:,0]
-v = yhp[:,1]
-w = yhp[:,2]
-dx  = torch.autograd.grad(yhp, t_physics, torch.ones_like(yhp), create_graph=True)[0]
-physics = dx - sigma*(v-u) - rho*u + v + u*w - u*v - beta*w  # Residual de la ecuación diferencial
-loss2 = l*torch.mean(physics**2)
-
-"""
-
 for epoch in range(iterations):
     optimizer.zero_grad()  # vuelvo a borrar el optimizer
-    yh = pinn(t_data[::10].to(torch.float32))  # yh es la pinn en t_data
-    loss1 = torch.mean((yh - y_data[::10]) ** 2)
-    yhp = pinn(t_physics[::10])  # yhp es la pinn en t_phyiscs
+    yh = pinn(t_data.to(torch.float32))  # yh es la pinn en t_data
+    loss1 = torch.mean((yh - y_data) ** 2)
+    yhp = pinn(t_physics)  # yhp es la pinn en t_phyiscs
     # Computo de derivada
     u = yhp[:, 0]
     v = yhp[:, 1]
@@ -90,23 +84,5 @@ for epoch in range(iterations):
     optimizer.step()
 
     if epoch % 100 == 0:
-        torch.save(pinn, "pinn_lorenz.pt")
         with torch.autograd.no_grad():
             print(epoch, loss1, loss2, "Traning Loss:", loss.data)
-
-
-t0 = 0  # Tiempo inicial
-tf = 50  # Tiempo final
-N = int(tf / h)  # Numero de puntos
-test_time = torch.linspace(t0, tf, N).view(-1, 1)
-t2, y_test = correr(lorenz, r0, tf, h, (sigma, rho, beta))
-yhp = pinn(test_time)  # Evaluación de la red
-
-plt.plot(y_test[:, 0], y_test[:, 1], label="teórica")
-plt.plot(yhp[:, 0].detach().numpy(), yhp[:, 1].detach().numpy(), label="red")
-
-plt.plot(y_test[:-1, 0], yhp[:, 0].detach().numpy())
-plt.xlabel("x")
-plt.ylabel("y")
-plt.legend()
-plt.show()

@@ -21,6 +21,20 @@ def RK4(f, t0, r0, params, h, pasos):
     return np.array(R)
 
 
+def RK2(f, t0, r0, params, h):
+    """RK de orden 4"""
+    # inicial
+    t = t0
+    r = r0
+
+    k1 = f(t, r, params)
+    k4 = f(t + h, r + h * k1, params)
+
+    r = r + h / 6 * (k1 + k4)
+
+    return np.array(r)
+
+
 def balance(Energy, dEdt, uv, dt, params):
     """
     Esta función recibe u (x), v (dx/dt), parametros extra y
