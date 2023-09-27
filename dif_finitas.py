@@ -25,24 +25,14 @@ def solver_burgers(u, nu, dx, dt):
                 - dt / dx * 0.5 * u[0, j] * (u[1, j] - u[-1, j])
                 + nu * dt / dx**2 * (u[-1, j] - 2*u[0, j] + u[1, j])
             )
-        for i in range(1, Nx - 2):
+        for i in range(1, Nx - 1):
             # ojo que a todo le estoy restando uno extra porque empiezo desde cero!
             u[i, j + 1] = (
                 u[i, j]
                 - dt / dx * 0.5 * u[i,j] * (u[i + 1, j] - u[i - 1, j])
                 + nu * dt / dx**2 * (u[i - 1, j] - 2*u[i, j] + u[i + 1, j])
             )
-        u[Nx - 2, j + 1] = (
-                u[Nx - 2, j]
-                - dt / dx * 0.5 * u[Nx - 2, j] * (u[Nx - 1, j] - u[Nx - 3, j])
-                + nu * dt / dx**2 * (u[Nx - 3, j] - 2*u[Nx - 2, j] + u[Nx - 1, j])
-            )
         u[Nx - 1, j + 1] = (
-                u[Nx - 1, j]
-                - dt / dx * 0.5 * u[Nx - 1, j] * (u[0, j] - u[Nx - 2, j])
-                + nu * dt / dx**2 * (u[Nx - 2, j] - 2*u[Nx - 1, j] + u[0, j])
-            )
-        u[0, j + 1] = (
                 u[Nx - 1, j]
                 - dt / dx * 0.5 * u[Nx - 1, j] * (u[0, j] - u[Nx - 2, j])
                 + nu * dt / dx**2 * (u[Nx - 2, j] - 2*u[Nx - 1, j] + u[0, j])
