@@ -68,54 +68,42 @@ input_physics = torch.cat((x_grid, t_grid), dim=-1)
 pinn = MLP([2] + [20] * 8 + [1])  # la red feedforward
 optimizer = torch.optim.Adam(pinn.parameters(), lr=1e-4)  # usamos este optimizador
 l = 1  # Lambda
-iterations = 20000
+iterations = 100000
 
-# for epoch in range(iterations):
-#     optimizer.zero_grad()
-#     # Condiciones iniciales
-#     yh_init = pinn(
-#         input_init.to(torch.float32),
-#     )
-#     loss1 = torch.mean((yh_init - y_data_init) ** 2)
-#     # condiciones de contorno
-#     yh_cc = pinn(input_cc.to(torch.float32))
-#     loss2 = torch.mean((yh_cc - y_data_cc) ** 2)
+for epoch in range(iterations):
+    optimizer.zero_grad()
+    # Condiciones iniciales
+    yh_init = pinn(
+        input_init.to(torch.float32),
+    )
+    loss1 = torch.mean((yh_init - y_data_init) ** 2)
+    # condiciones de contorno
+    yh_cc = pinn(input_cc.to(torch.float32))
+    loss2 = torch.mean((yh_cc - y_data_cc) ** 2)
 
-#     # Condiciones de la física
-#     yhp = pinn(input_physics.to(torch.float32))
-#     dt = torch.autograd.grad(yhp, t_grid, torch.ones_like(yhp), create_graph=True)[
-#         0
-#     ]  # computamos u_t
-#     dx = torch.autograd.grad(yhp, x_grid, torch.ones_like(yhp), create_graph=True)[
-#         0
-#     ]  # computamos u_x
-#     dx2 = torch.autograd.grad(
-#         dx, x_grid, torch.ones_like(yhp), create_graph=True, allow_unused=True
-#     )[
-#         0
-#     ]  # computamos u_xx
-#     physics = dt + yhp * dx - nu * dx2
-#     loss3 = l * torch.mean(physics**2)
-#     loss = loss1 + loss2 + loss3  # Sumamos todos los errores
-#     loss.backward()
-#     optimizer.step()
-#     # with torch.autograd.no_grad():
-#     #     print(
-#     #         epoch,
-#     #         "CI",
-#     #         float(loss1),
-#     #         "CC",
-#     #         float(loss2),
-#     #         "Física:",
-#     #         float(loss3),
-#     #         "Traning Loss:",
-#     #         float(loss.data),
-#     #     )
-#     if epoch % 100 == 0:
-#         torch.save(pinn, "pinn_burgers.pt")
+    # Condiciones de la física
+    yhp = pinn(input_physics.to(torch.float32))
+    dt = torch.autograd.grad(yhp, t_grid, torch.ones_like(yhp), create_graph=True)[
+        0
+    ]  # computamos u_t
+    dx = torch.autograd.grad(yhp, x_grid, torch.ones_like(yhp), create_graph=True)[
+        0
+    ]  # computamos u_x
+    dx2 = torch.autograd.grad(
+        dx, x_grid, torch.ones_like(yhp), create_graph=True, allow_unused=True
+    )[
+        0
+    ]  # computamos u_xx
+    physics = dt + yhp * dx - nu * dx2
+    loss3 = l * torch.mean(physics**2)
+    loss = loss1 + loss2 + loss3  # Sumamos todos los errores
+    loss.backward()
+    optimizer.step()
+    if epoch % 100 == 0:
+        torch.save(pinn, "pinn_burgers2.pt")
 # with torch.autograd.no_grad():
 # print(epoch, loss1, loss2, "Traning Loss:", loss.data)
-pinn = torch.load("pinn_burgers.pt")
+# pinn = torch.load("pinn_burgers.pt")
 
 t0 = 0  # Tiempo inicial
 tf = 1  # Tiempo final
