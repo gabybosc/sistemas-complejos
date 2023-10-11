@@ -19,10 +19,10 @@ k = np.arange(0, Nx / 2 + 1)
 N = np.zeros((Nt, Nx))
 N[0, :] = 10
 
-C = np.zeros((Nt, Nx))
-for i in range(Nt):
-    for j in range(Nx):
-        C[i, j] = c0 * (1 + 0.8 * np.cos(w1 * t[i]) * np.sin(w2 * x[j]))
+# C = np.zeros((Nt, Nx))
+# for i in range(Nt):
+#     for j in range(Nx):
+#         C[i, j] = c0 * (1 + 0.8 * np.cos(w1 * t[i]) * np.sin(w2 * x[j]))
 
 # np.save("C.npy", C)
 C = np.load("C.npy")
@@ -65,21 +65,35 @@ def evol(f, N, Nt, params, C, dt):
     return N
 
 
-sol = evol(rip, N, Nt, [k, a, nu], C, dt)
-
-plt.imshow(sol, aspect="auto")
-plt.show()
-
-# rip(t, N, [k, a, nu], C[1, :])
-
-# sol = np.zeros((N, step))
-# sol[:, 0] = u
-# for i in np.arange(step - 1):  # Evolución temporal
-#     sol[:, i + 1] = evol(rip, sol[:, i], k, [nu, N], dt)
-
-
-# for i in [0, 1900, 3900, 5900, 7900, 9900]:
-#     plt.plot(x, sol[:, i], label=f"iteración {i}")
-# plt.legend()
-# plt.title("Formación del choque")
+# sol = evol(rip, N, Nt, [k, a, nu], C, dt)
+# np.save("solucion_a.npy", sol)
+sol = np.load("solucion_a.npy")
 # plt.show()
+
+
+# calculamos la matrix U'U/Nt
+mat = np.dot(np.transpose(sol), sol) / Nt
+
+# calculamos av y av
+l, vv = np.linalg.eigh(mat)
+v = np.transpose(vv)
+
+# la matriz phi será la matriz de av traspuesta
+phi = np.transpose([v[-1], v[-2], v[-3]])  # , v[-4], v[-5]])
+
+# A es el producto de la U con phi
+A = np.dot(sol, phi)
+
+# la solución reducida es A * phi
+sol_3m = np.dot(A, np.transpose(phi))
+
+fig = plt.figure()
+fig.subplots_adjust(
+    top=0.95, bottom=0.1, left=0.05, right=0.95, hspace=0.005, wspace=0.15
+)
+ax1 = plt.subplot2grid((2, 1), (0, 0))
+ax2 = plt.subplot2grid((2, 1), (1, 0))
+
+ax1.imshow(sol, aspect="auto")
+ax2.imshow(sol_3m, aspect="auto")
+plt.show()
