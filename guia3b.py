@@ -79,7 +79,8 @@ l, vv = np.linalg.eigh(mat)
 v = np.transpose(vv)
 
 # la matriz phi será la matriz de av traspuesta
-phi = np.transpose([v[-1], v[-2], v[-3]])  # , v[-4], v[-5]])
+phi = np.transpose([v[-1], v[-2], v[-3], v[-4], v[0]])
+np.save("phi.npy", phi)
 
 # A es el producto de la U con phi
 A = np.dot(sol, phi)
