@@ -79,11 +79,12 @@ l, vv = np.linalg.eigh(mat)
 v = np.transpose(vv)
 
 # la matriz phi será la matriz de av traspuesta
-phi = np.transpose([v[-1], v[-2], v[-3], v[-4], v[0]])
-np.save("phi.npy", phi)
+phi = np.transpose([v[-1], v[-2], v[-3], v[-4], v[-5], v[-6], v[-7]])
+np.save("phi7.npy", phi)
 
 # A es el producto de la U con phi
 A = np.dot(sol, phi)
+np.save("A7.npy", A)
 
 # la solución reducida es A * phi
 sol_3m = np.dot(A, np.transpose(phi))
