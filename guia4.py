@@ -21,15 +21,6 @@ def rip(t, u, params):
     return f
 
 
-# def evol(f, t, u_k, Nt, params, dt):
-#     # u = np.zeros((len(u_k), len(u_k[0,:])))
-#     for i in range(Nt - 1):
-#         u_k[i + 1, :] = u_k[i, :] + dt * f(t, u_k[i, :], params)
-
-#     u = np.fft.irfft(u_k)
-#     return u
-
-
 def RK2(f, t0, r0, params, h):
     """RK de orden 2"""
     # inicial
@@ -56,20 +47,23 @@ def evol(f, u, Nt, params, dt):
     return u
 
 
-beta = 0.022
-nx = 128
+def soliton(x, v, beta):
+    f = 3 * v * np.cosh(np.sqrt(v / 4 / beta) * (x - np.pi)) ** -2
+
+    return f
+
+
+beta = 0.1
+nx = 256
 dx = 2 * np.pi / nx
-dt = 5e-5
-t = np.arange(0, 1, dt)
+dt = 5e-6
+t = np.arange(0, 5, dt)
 nt = len(t)
 x = np.linspace(0, 2 * np.pi, nx, endpoint=False)
 k = np.arange(0, nx / 2 + 1)
 
-v = 1
-
-u_ini = 3 * v * np.cosh(np.sqrt(v / 4 / beta) * (x - np.pi)) ** -2
 u = np.zeros((nt, nx))
-u[0, :] = u_ini
+u[0, :] = soliton(x, 2, beta) + soliton(x, 10, beta)
 
 sol = evol(rip, u, nt, [k, beta], dt)
 plt.imshow(sol, aspect="auto")
