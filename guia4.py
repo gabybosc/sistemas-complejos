@@ -38,33 +38,53 @@ def RK2(f, t0, r0, params, h):
 def evol(f, u, Nt, params, dt):
     # Evoluciona en el tiempo la PDE usando el método pseudoespectral y Runge-Kutta de segundo orden
     t0 = 0
+    Nx = len(u[0, :])
     for i in range(Nt - 1):
         u[i + 1, :] = RK2(f, t0, u[i, :], params, dt)
-    # utilde[int(N / 3) :] = 0  # Dealiasing (eliminemos modos espurios!)
-
+        utilde = np.fft.rfft(u[i + 1, :])
+        utilde[int(Nx / 3) :] = 0  # Dealiasing (eliminemos modos espurios!)
+        u[i + 1, :] = np.fft.irfft(utilde)
     # out = np.fft.irfft(utilde)  t# Vuelve al espacio real
 
     return u
 
 
 def soliton(x, v, beta):
-    f = 3 * v * np.cosh(np.sqrt(v / 4 / beta) * (x - np.pi)) ** -2
+    f = 3 * v * np.cosh(np.sqrt(v / (4 * beta)) * x) ** -2
 
     return f
 
 
-beta = 0.1
-nx = 256
+beta = 0.022
+nx = 128
 dx = 2 * np.pi / nx
-dt = 5e-6
-t = np.arange(0, 5, dt)
+dt = 5e-5
+t = np.arange(0, 10, dt)
 nt = len(t)
 x = np.linspace(0, 2 * np.pi, nx, endpoint=False)
 k = np.arange(0, nx / 2 + 1)
 
 u = np.zeros((nt, nx))
-u[0, :] = soliton(x, 2, beta) + soliton(x, 10, beta)
+# u[0, :] = (
+#     soliton(x - np.pi / 2, 2, beta)
+#     # + soliton(x - np.pi, 1, beta)
+#     + soliton(x - 3 * np.pi / 2, 10, beta)
+# )
+
+u[0, :] = np.cos(x + np.pi / 2)
 
 sol = evol(rip, u, nt, [k, beta], dt)
 plt.imshow(sol, aspect="auto")
 plt.show()
+
+# # plt.plot(x, soliton(x, 5, beta))
+# plt.plot(u[0, :])
+# plt.show()
+
+
+# u = np.cos(x)
+
+# V = -u / 6 / beta
+
+# plt.plot(x, V)
+# plt.show()
