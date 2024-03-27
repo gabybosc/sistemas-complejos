@@ -2,8 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from funciones import RK4, correr, lorenz
 
+
 r0 = [0, 0.5, 0.5]
 sigmarhobeta = (10, 25, 8 / 3)
+
 tf = 50
 h = 1e-4
 evo = correr(lorenz, r0, tf, h, sigmarhobeta)
@@ -19,7 +21,6 @@ ax.plot(
     evo[:, 2],
 )
 plt.show()
-
 """
 b) Integrando como en c y usando rho=30 compare la evolución temporal de y
 para las condiciones iniciales (x0,y0,z0)=(0,0.5,0.5) y (x′0,y′0,z′0)=(0,0.5,0.50001). ¿Qué observa?

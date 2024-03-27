@@ -68,11 +68,9 @@ def correr(f, r0, tf, dt, params):
 
     i = 0
     evolution = []
-    time = []
     while solver.successful() and solver.t < tf:
         i += 1
         solver.integrate(solver.t + dt)
         evolution.append(solver.y)
-        time.append(solver.t + dt)
 
-    return np.array(time), np.array(evolution)
+    return np.array(evolution)
