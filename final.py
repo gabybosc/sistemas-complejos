@@ -50,3 +50,21 @@ def haz_debil(u, phi, params):
     dudx = a * u * np.sin(phi)
     dpdx = 2 * delta + b * u**2 + 2 * a * np.cos(phi) + d * u**2 * np.cos(phi)
     return dudx, dpdx
+
+
+v = 1
+c = 0
+u = np.linspace(-5, 5, 100)
+V = u**3 / 6 - v * u**2 / 2 + c
+plt.plot(u, V)
+plt.axhline(y=0, c="C1", label="separatriz")
+plt.axhline(y=-0.662, c="C2", label="trayectoria circular")
+plt.xlabel("u")
+plt.ylabel("V")
+plt.xlim([-2, 4])
+plt.ylim([-2, 2])
+plt.xticks([])
+plt.yticks([])
+plt.grid()
+plt.legend()
+plt.show()

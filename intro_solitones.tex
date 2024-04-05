@@ -1,0 +1,106 @@
+%! Author = gabybosc
+%! Date = 5/4/24
+
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+
+% Document
+\begin{document}
+
+    \section{Solitones}\label{sec:solitones}
+
+    El solitón fue observado por primera vez por J. S. Russell mientras caminaba junto a los canales de Glasgow.
+    Un bote frenó en medio del canal, pero no así la onda que había creado.
+    Esta onda continuó su camino a lo largo del canal, sin deformarse ni cambiar su velocidad.
+    Este fenómeno llevó a Russell a intentar replicar la onda solitaria (el solitón) en su laboratorio, donde observó que el solitón es una onda de gravedad que viaja con velocidad
+    \begin{equation}
+        U = \sqrt{g(h+a)}
+        \label{eq:vel_soliton}
+    \end{equation}
+    donde $g$ es la gravedad, $a$ es la amplitud máxima de la onda y $h$ es la profundidad del canal.
+    De esta ecuación, se despega inmediatamente que una onda más alta viajará con mayor velocidad.
+
+
+    Tiempo después, Korteweg y de Vries escribieron una ecuación que admite \ref{eq:soliton_NLS} como solución:
+    \begin{equation}
+        u_t + u u_x + \beta u_{xxx} = 0
+        \label{eq:KdV}
+    \end{equation}
+
+    Haciendo un cambio de variables, podemos escribir KdV como un potencial
+    \begin{equation}
+        \beta u’’ = -\frac{dV}{du}
+        \label{eq:KdV_potencial}
+    \end{equation}
+    usando
+    \begin{equation*}
+        V(u) = \frac{u^3}{6}- \frac{vu^2}{2} + C
+    \end{equation*}
+
+    Integrando, obtenemos
+    \begin{equation*}
+        \beta \frac{u’^2}{2} = -\frac{u^3}{6} + \frac{vu^2}{2} + C
+    \end{equation*}
+    \begin{equation}
+        u(x,t) = 3 v (\cosh{ \sqrt{ \frac{v}{4\beta} (x-vt) } })^{-2}
+        \label{eq:sol_KdV}
+    \end{equation}
+    Esta última (eq \ref{eq:sol_KdV}) es la solución exacta de KdV, que se propaga con velocidad $v$ sin deformarse.
+    La amplitud de la onda dependerá de su velocidad, de modo tal que los solitones más altos viajan con mayor velocidad.
+    % La amplitud máxima es $3v$ y vale 0 en el infinito.
+
+    En la figura % poner y citar
+    está graficada $V$ como función de $u$.
+    La línea naranja corresponde a excitar a la onda solitaria, la solución de KdV es $u=0$ en el infinito.
+    Por otro lado, la línea verde corresponde al tren de solitones.
+    Todas las soluciones intermedias son posibles, serán varios solitones excitados y la velocidad tomará valores entre 0 y $3v$.
+
+    La ecuación de Schrödinger no lineal (NLS) permite como solución solitones de la forma
+    \begin{equation}
+        \psi(x,t) = \sqrt{2} A_0 \sech{\sqrt{-\frac{2g}{\omega_0}} A_0(x - u t)} \exp{i (\frac{u (2x-ut)}{2\omega_0’’} - g A_0 t)}
+        \label{eq:soliton_NLS}
+    \end{equation}
+
+
+    \section{MHD de dos fluidos}\label{sec:MHD}
+
+    \begin{equation}
+        \frac{\partial}{\partial t} n_p + \nabla \cdot (n_p \mathbf{v_p}) = 0
+    \label{eq:continuidad}
+    \end{equation}
+
+    \begin{equation}
+        \frac{\partial}{\partial t} (n_p \mathbf{v_p}) + \nabla \cdot (n_p \mathbf{v_p} \mathbf{v_p} + \frac{P_p}{m_p}) =
+        \frac{1}{m_p} (etc)
+    \label{eq:momento}
+    \end{equation}
+
+    \begin{equation}
+        \frac{\partial \mathbf{B}}{\partial t} + \nabla \times (\frac{1}{n_e}(n_p \mathbf{v_p} + n_h \mathbf{v_h}) \times \mathbf{B}) -
+        \frac{\mathbf{B}\cdot \nabla \mathbf{B}}{e n_e \mu_0} = 0
+        \label{eq:Faraday}
+    \end{equation}
+    \section{oscilitones}\label{sec:oscilitones}
+
+    En diferentes plasmas espaciales, se observaron estructuras coherentes de baja frecuencia que llamaremos
+    oscilitones, es decir, solitones que poseen una subestructura oscilante.
+    % poner acá un gráfico de estos
+
+    Consideremos un plasma bi-iónico cuyo flujo sea perpendicular al campo magnético, $\mathbf{B} = (0,0,B)$, $\mathbf{u}_i = (u_{ix}, u_{iy}, 0)$.
+    Además, el sistema es estacionario ($\frac{\partial}{\partial t} = 0$) y sólo hay variaciones a lo largo del eje $\hat x$, $\frac{D_i}{Dt} = u_i \frac{d}{dx}$.
+    \citep{McKenzie2001}
+
+
+    En el caso general de propagación oblicua \citep{Sauer2001} ..
+    Resolviendo la versión linealizada de las ecuaciones \ref{eq:continuidad}, \ref{eq:momento}, \ref{eq:Faraday}
+    para ondas planas de la forma $\exp{i (\mathbf{k}\cdot \mathbf{x} - \omega t) }$ estudian las características
+    fundamentales para la existencia de los oscilitones.
+
+
+\end{document}
